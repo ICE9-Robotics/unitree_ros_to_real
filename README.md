@@ -7,7 +7,7 @@ This ROS package provides high level control of the Unitree Go1 quadrupted and e
 We recommand users to run this package in Ubuntu 18.04 and ROS melodic environment
 
 ## Dependencies
-[v3.8.0](https://github.com/unitreerobotics/unitree_legged_sdk/releases/tag/3.8.0)
+[unitree_legged_sdk v3.8.0](https://github.com/unitreerobotics/unitree_legged_sdk/releases/tag/3.8.0)
 
 # Configuration
 Before compiling this package, please download the corresponding unitree_legged_sdk as noted above, and put it to your own workspace's source folder(e.g. `~/catkin_ws/src`). Be careful with the sdk folder name. It should be "unitree_legged_sdk" without version tag.
