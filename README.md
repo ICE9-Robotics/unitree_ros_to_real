@@ -9,7 +9,7 @@ We recommand users to run this package in Ubuntu 18.04 and ROS melodic environme
 ## Dependencies
 [unitree_legged_sdk v3.8.0](https://github.com/unitreerobotics/unitree_legged_sdk/releases/tag/3.8.0):
 
-# Inatall
+# Install
 ```
 git clone -b v3.8.0 https://github.com/unitreerobotics/unitree_legged_sdk.git ~/catkin_ws/src/unitree_legged_sdk
 git clone https://github.com/ICE9-Robotics/unitree_ros_to_real.git ~/catkin_ws/src/unitree_ros_to_real
