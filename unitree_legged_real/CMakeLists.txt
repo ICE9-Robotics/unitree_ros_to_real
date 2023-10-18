@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
     sensor_msgs
     unitree_legged_msgs
+    nav_msgs
 )
 
 catkin_package()
@@ -34,3 +35,6 @@ include_directories(
 add_executable(unitree_high_level src/exe/unitree_high_level.cpp)
 target_link_libraries(unitree_high_level ${EXTRA_LIBS} ${catkin_LIBRARIES})
 add_dependencies(unitree_high_level ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(unitree_odom_tf_fix_node src/exe/unitree_odom_tf_fix_node.cpp)
+target_link_libraries(unitree_odom_tf_fix_node ${catkin_LIBRARIES})

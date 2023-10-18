@@ -1,3 +1,4 @@
 <launch>
     <node pkg="unitree_legged_real" type="unitree_high_level" name="unitree_high_level_node" output="screen"/>
+    <node pkg="unitree_legged_real" type="unitree_odom_tf_fix_node" name="unitree_odom_tf_node" output="screen"/>
 </launch>
