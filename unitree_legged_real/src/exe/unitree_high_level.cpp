@@ -80,14 +80,16 @@ void publishIMU()
     pub_imu.publish(imu);
 }
 
+void publishHighState()
+{
+    unitree_legged_msgs::HighState high_state_ros;
+    high_state_ros = state2rosMsg(unitree.high_state);
+    pub_high_state.publish(high_state_ros);
+}
+
 void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg)
 {
     unitree.high_cmd = rosMsg2Cmd(msg);
-
-    unitree_legged_msgs::HighState high_state_ros;
-    high_state_ros = state2rosMsg(unitree.high_state);
-
-    pub_high_state.publish(high_state_ros);
 }
 
 int main(int argc, char **argv)
@@ -99,11 +101,13 @@ int main(int argc, char **argv)
     pub_high_state = nh.advertise<unitree_legged_msgs::HighState>("high_state", 1);
     pub_imu = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
 
-    LoopFunc loop_imuPub("imu", 0.002, 3, publishIMU);
+    LoopFunc loop_imuPub("imu", 0.05, 3, publishIMU);
+    LoopFunc loop_highStatePub("high_state", 0.05, 3, publishHighState);
     LoopFunc loop_udpSend("high_udp_send", 0.002, 3, boost::bind(&UnitreeHighLevel::highUdpSend, &unitree));
     LoopFunc loop_udpRecv("high_udp_recv", 0.002, 3, boost::bind(&UnitreeHighLevel::highUdpRecv, &unitree));
 
     loop_imuPub.start();
+    loop_highStatePub.start();
     loop_udpSend.start();
     loop_udpRecv.start();
 
