@@ -84,6 +84,7 @@ void publishHighState()
 {
     unitree_legged_msgs::HighState high_state_ros;
     high_state_ros = state2rosMsg(unitree.high_state);
+    high_state_ros.header.stamp = ros::Time::now();
     pub_high_state.publish(high_state_ros);
 }
 
