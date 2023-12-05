@@ -94,8 +94,8 @@ void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg)
     unitree.high_cmd = rosMsg2Cmd(msg);
 }
 
-bool modeSrvCallback(const unitree_legged_msgs::SetUnitreeHLMode::Request &req,
-                     const unitree_legged_msgs::SetUnitreeHLMode::Response &)
+bool modeSrvCallback(unitree_legged_msgs::SetUnitreeHLMode::Request &req,
+                     unitree_legged_msgs::SetUnitreeHLMode::Response &)
 {
     // allowed modes: 0=idle stand, 5=stand down, 6=stand up, 7=damping, 8=recovery stand
     if (req.mode != 0 || req.mode != 5 || req.mode != 6 || req.mode != 7 || req.mode != 8)
