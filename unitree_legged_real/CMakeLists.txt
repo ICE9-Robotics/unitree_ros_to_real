@@ -9,7 +9,15 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     unitree_legged_msgs
     nav_msgs
+    message_runtime
 )
+
+add_service_files(
+  FILES
+    SetUnitreeHLMode.srv
+)
+
+generate_messages()
 
 catkin_package()
 

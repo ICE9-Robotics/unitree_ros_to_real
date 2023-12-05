@@ -1,14 +1,14 @@
 #include <ros/ros.h>
 #include <unitree_legged_msgs/HighCmd.h>
 #include <unitree_legged_msgs/HighState.h>
-#include <unitree_legged_msgs/LowCmd.h>
-#include <unitree_legged_msgs/LowState.h>
-#include "unitree_legged_sdk/unitree_legged_sdk.h"
-#include "convert.h"
 #include <chrono>
 #include <pthread.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
+
+#include "unitree_legged_real/SetUnitreeHLMode.h"
+#include "unitree_legged_sdk/unitree_legged_sdk.h"
+#include "convert.h"
 
 #define UDP_HIGH_LEVEL_IP "192.168.123.161"
 #define UDP_HIGH_LEVEL_PORT_LOCAL 8090
@@ -53,6 +53,7 @@ UnitreeHighLevel unitree;
 ros::Subscriber sub_cmd_vel;
 ros::Publisher pub_high_state;
 ros::Publisher pub_imu;
+ros::ServiceClient mode_srv_client;
 
 void publishIMU()
 {
@@ -93,6 +94,20 @@ void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg)
     unitree.high_cmd = rosMsg2Cmd(msg);
 }
 
+bool modeSrvCallback(const unitree_legged_real::SetUnitreeHLMode::Request &req,
+                     const unitree_legged_real::SetUnitreeHLMode::Response &)
+{
+    // allowed modes: 0=idle stand, 5=stand down, 6=stand up, 7=damping, 8=recovery stand
+    if (req.mode != 0 || req.mode != 5 || req.mode != 6 || req.mode != 7 || req.mode != 8)
+    {
+        ROS_ERROR("Invalid mode: %d", req.mode);
+        return false;
+    }
+    unitree.high_cmd.mode = req.mode;
+
+    return true;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "twist_sub");
@@ -101,6 +116,7 @@ int main(int argc, char **argv)
     sub_cmd_vel = nh.subscribe("cmd_vel", 1, cmdVelCallback);
     pub_high_state = nh.advertise<unitree_legged_msgs::HighState>("high_state", 1);
     pub_imu = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
+    mode_srv_client = nh.serviceClient<unitree_legged_real::SetUnitreeHLMode>("set_unitree_hl_mode");
 
     LoopFunc loop_imuPub("imu", 0.05, 3, publishIMU);
     LoopFunc loop_highStatePub("high_state", 0.05, 3, publishHighState);

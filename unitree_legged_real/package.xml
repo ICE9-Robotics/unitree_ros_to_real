@@ -23,6 +23,7 @@
   <exec_depend>nav_msgs</exec_depend>
 
   <depend>unitree_legged_msgs</depend>
+  <depend>generate_messages</depend>
   <depend>eigen</depend>
 
 </package>
