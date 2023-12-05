@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     sub_cmd_vel = nh.subscribe("cmd_vel", 1, cmdVelCallback);
     pub_high_state = nh.advertise<unitree_legged_msgs::HighState>("high_state", 1);
     pub_imu = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
-    mode_srv = nh.advertiseService("set_unitree_high_level_mode", modeSrvCallback));
+    mode_srv = nh.advertiseService("set_unitree_high_level_mode", modeSrvCallback);
 
     LoopFunc loop_imuPub("imu", 0.05, 3, publishIMU);
     LoopFunc loop_highStatePub("high_state", 0.05, 3, publishHighState);
