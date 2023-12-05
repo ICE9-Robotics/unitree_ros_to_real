@@ -6,7 +6,7 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
 
-#include "unitree_legged_real/SetUnitreeHLMode.h"
+#include "unitree_legged_msgs/SetUnitreeHLMode.h"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
 #include "convert.h"
 
@@ -94,8 +94,8 @@ void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg)
     unitree.high_cmd = rosMsg2Cmd(msg);
 }
 
-bool modeSrvCallback(const unitree_legged_real::SetUnitreeHLMode::Request &req,
-                     const unitree_legged_real::SetUnitreeHLMode::Response &)
+bool modeSrvCallback(const unitree_legged_msgs::SetUnitreeHLMode::Request &req,
+                     const unitree_legged_msgs::SetUnitreeHLMode::Response &)
 {
     // allowed modes: 0=idle stand, 5=stand down, 6=stand up, 7=damping, 8=recovery stand
     if (req.mode != 0 || req.mode != 5 || req.mode != 6 || req.mode != 7 || req.mode != 8)
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     sub_cmd_vel = nh.subscribe("cmd_vel", 1, cmdVelCallback);
     pub_high_state = nh.advertise<unitree_legged_msgs::HighState>("high_state", 1);
     pub_imu = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
-    mode_srv_client = nh.serviceClient<unitree_legged_real::SetUnitreeHLMode>("set_unitree_hl_mode");
+    mode_srv_client = nh.serviceClient<unitree_legged_msgs::SetUnitreeHLMode>("set_unitree_hl_mode");
 
     LoopFunc loop_imuPub("imu", 0.05, 3, publishIMU);
     LoopFunc loop_highStatePub("high_state", 0.05, 3, publishHighState);
