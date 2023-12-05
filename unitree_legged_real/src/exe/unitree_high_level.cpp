@@ -98,7 +98,7 @@ bool modeSrvCallback(unitree_legged_msgs::SetUnitreeHLMode::Request &req,
                      unitree_legged_msgs::SetUnitreeHLMode::Response &)
 {
     // allowed modes: 0=idle stand, 5=stand down, 6=stand up, 7=damping, 8=recovery stand
-    if (req.mode != 0 || req.mode != 5 || req.mode != 6 || req.mode != 7 || req.mode != 8)
+    if (req.mode != 0 && req.mode != 5 && req.mode != 6 && req.mode != 7 && req.mode != 8)
     {
         ROS_ERROR("Invalid mode: %d", req.mode);
         return false;
