@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(unitree_legged_real)
 
-set(CMAKE_CXX_FLAGS "-O3 -fPIC -std=c++11")
+add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -20,12 +20,16 @@ else()
   set(ARCH arm64)
 endif()
 
-set(EXTRA_LIBS -pthread ${unitree_legged_sdk_LIBRARIES})
+link_directories(${CMAKE_SOURCE_DIR}/unitree_legged_sdk/lib/cpp/${ARCH})
+
+set(EXTRA_LIBS -pthread libunitree_legged_sdk.so)
+
+set(CMAKE_CXX_FLAGS "-O3 -fPIC")
 
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
-    ${unitree_legged_sdk_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/unitree_legged_sdk/include
 )
 
 add_executable(unitree_high_level src/exe/unitree_high_level.cpp)
