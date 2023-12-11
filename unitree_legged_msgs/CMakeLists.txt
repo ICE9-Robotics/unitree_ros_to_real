@@ -23,6 +23,11 @@ add_message_files(
   HighState.msg
 )
 
+add_service_files(
+  FILES
+    SetUnitreeHLMode.srv
+)
+
 generate_messages(
   DEPENDENCIES
   std_msgs

@@ -1,14 +1,14 @@
 #include <ros/ros.h>
 #include <unitree_legged_msgs/HighCmd.h>
 #include <unitree_legged_msgs/HighState.h>
-#include <unitree_legged_msgs/LowCmd.h>
-#include <unitree_legged_msgs/LowState.h>
-#include "unitree_legged_sdk/unitree_legged_sdk.h"
-#include "convert.h"
 #include <chrono>
 #include <pthread.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
+
+#include "unitree_legged_msgs/SetUnitreeHLMode.h"
+#include "unitree_legged_sdk/unitree_legged_sdk.h"
+#include "convert.h"
 
 #define UDP_HIGH_LEVEL_IP "192.168.123.161"
 #define UDP_HIGH_LEVEL_PORT_LOCAL 8090
@@ -53,6 +53,7 @@ UnitreeHighLevel unitree;
 ros::Subscriber sub_cmd_vel;
 ros::Publisher pub_high_state;
 ros::Publisher pub_imu;
+ros::ServiceServer mode_srv;
 
 void publishIMU()
 {
@@ -80,14 +81,31 @@ void publishIMU()
     pub_imu.publish(imu);
 }
 
+void publishHighState()
+{
+    unitree_legged_msgs::HighState high_state_ros;
+    high_state_ros = state2rosMsg(unitree.high_state);
+    high_state_ros.header.stamp = ros::Time::now();
+    pub_high_state.publish(high_state_ros);
+}
+
 void cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg)
 {
     unitree.high_cmd = rosMsg2Cmd(msg);
+}
 
-    unitree_legged_msgs::HighState high_state_ros;
-    high_state_ros = state2rosMsg(unitree.high_state);
+bool modeSrvCallback(unitree_legged_msgs::SetUnitreeHLMode::Request &req,
+                     unitree_legged_msgs::SetUnitreeHLMode::Response &)
+{
+    // allowed modes: 0=idle stand, 5=stand down, 6=stand up, 7=damping, 8=recovery stand
+    if (req.mode != 0 && req.mode != 5 && req.mode != 6 && req.mode != 7 && req.mode != 8)
+    {
+        ROS_ERROR("Invalid mode: %d", req.mode);
+        return false;
+    }
+    unitree.high_cmd.mode = req.mode;
 
-    pub_high_state.publish(high_state_ros);
+    return true;
 }
 
 int main(int argc, char **argv)
@@ -98,12 +116,15 @@ int main(int argc, char **argv)
     sub_cmd_vel = nh.subscribe("cmd_vel", 1, cmdVelCallback);
     pub_high_state = nh.advertise<unitree_legged_msgs::HighState>("high_state", 1);
     pub_imu = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
+    mode_srv = nh.advertiseService("set_unitree_high_level_mode", modeSrvCallback);
 
-    LoopFunc loop_imuPub("imu", 0.002, 3, publishIMU);
+    LoopFunc loop_imuPub("imu", 0.05, 3, publishIMU);
+    LoopFunc loop_highStatePub("high_state", 0.05, 3, publishHighState);
     LoopFunc loop_udpSend("high_udp_send", 0.002, 3, boost::bind(&UnitreeHighLevel::highUdpSend, &unitree));
     LoopFunc loop_udpRecv("high_udp_recv", 0.002, 3, boost::bind(&UnitreeHighLevel::highUdpRecv, &unitree));
 
     loop_imuPub.start();
+    loop_highStatePub.start();
     loop_udpSend.start();
     loop_udpRecv.start();
 
