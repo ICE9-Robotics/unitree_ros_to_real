@@ -74,9 +74,15 @@ void publishIMU()
     imu.linear_acceleration.y = unitree.high_state.imu.accelerometer[1];
     imu.linear_acceleration.z = unitree.high_state.imu.accelerometer[2];
 
-    imu.orientation_covariance.fill(0);
-    imu.angular_velocity_covariance.fill(0);
-    imu.linear_acceleration_covariance.fill(0);
+    imu.orientation_covariance[0] = 0.1; //6.46e-12;
+    imu.orientation_covariance[4] = 0.1; //2.94e-8;
+    imu.orientation_covariance[8] = 0.1; //2.09e-8;
+    imu.angular_velocity_covariance[0] = 1.19e-7;
+    imu.angular_velocity_covariance[4] = 8.32e-8;
+    imu.angular_velocity_covariance[8] = 6.69e-8;
+    imu.linear_acceleration_covariance[0] = 2.17e-4;
+    imu.linear_acceleration_covariance[4] = 3.42e-4;
+    imu.linear_acceleration_covariance[8] = 3.79e-4;
 
     pub_imu.publish(imu);
 }
@@ -118,7 +124,7 @@ int main(int argc, char **argv)
     pub_imu = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
     mode_srv = nh.advertiseService("set_unitree_high_level_mode", modeSrvCallback);
 
-    LoopFunc loop_imuPub("imu", 0.05, 3, publishIMU);
+    LoopFunc loop_imuPub("imu", 0.02, 3, publishIMU);
     LoopFunc loop_highStatePub("high_state", 0.05, 3, publishHighState);
     LoopFunc loop_udpSend("high_udp_send", 0.002, 3, boost::bind(&UnitreeHighLevel::highUdpSend, &unitree));
     LoopFunc loop_udpRecv("high_udp_recv", 0.002, 3, boost::bind(&UnitreeHighLevel::highUdpRecv, &unitree));
